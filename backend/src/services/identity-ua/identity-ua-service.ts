@@ -57,6 +57,7 @@ export const identityUaServiceFactory = ({
     if (!identityUa) throw new UnauthorizedError({ message: "Invalid credentials" });
 
     const identityMembershipOrg = await identityOrgMembershipDAL.findOne({ identityId: identityUa.identityId });
+    if (identityMembershipOrg.isDisabled) throw new UnauthorizedError({ message: "Identity is disabled" });
 
     checkIPAgainstBlocklist({
       ipAddress: ip,

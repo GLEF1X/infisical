@@ -32,3 +32,28 @@ export const shake = <RemovedKeys extends string, T = object>(
     return acc;
   }, {} as T);
 };
+
+/**
+ * Omit properties from an object based on a predicate function.
+ *
+ * The `omitBy` function creates a new object composed of properties from the input
+ * object `obj` that do not satisfy the `predicate` function. The `predicate` is
+ * invoked for each property of `obj` with the value and the key as arguments.
+ *
+ * @example
+ * const obj = { a: 1, b: 'hello', c: 3, d: null };
+ * const result = omitBy(obj, (value, key) => typeof value === 'string' || value === null);
+ * // result: { a: 1, c: 3 }
+ */
+export const omitBy = <T extends object>(
+  obj: T,
+  predicate: (value: T[keyof T], key: keyof T) => boolean
+): Partial<T> => {
+  return Object.keys(obj).reduce((res, key) => {
+    const typedKey = key as keyof T;
+    if (!predicate(obj[typedKey], typedKey)) {
+      res[typedKey] = obj[typedKey];
+    }
+    return res;
+  }, {} as Partial<T>);
+};
