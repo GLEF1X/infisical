@@ -9,13 +9,12 @@ export const creditCardDataSchema = z
   .object({
     holderName: z
       .string()
-      .trim()
       .min(1)
       .max(255)
       .regex(/^[\d\s-]*$/)
       .optional(),
     provider: z.nativeEnum(CardProvider).optional(),
-    cardNumber: z.string().trim().optional(),
+    cardNumber: z.string().optional(),
     verificationNumber: z.number().optional(),
     // TODO: upgrade to zod 3.23 to get string date validation out of the box
     expireAt: z
@@ -31,7 +30,6 @@ export const creditCardDataSchema = z
       }),
     postalCode: z
       .string()
-      .trim()
       .refine((postalCode) => {
         // FIXME: add i18n locale
         return isPostalCode(postalCode, "US");
@@ -55,12 +53,12 @@ export const creditCardDataSchema = z
   );
 
 export const loginDataSchema = z.object({
-  username: z.string().trim().min(1).optional(),
-  password: z.string().trim().min(1).optional()
+  username: z.string().min(1).optional(),
+  password: z.string().min(1).optional()
 });
 
 export const secureNoteSchema = z.object({
-  content: z.string().trim().min(1).optional()
+  content: z.string().min(1).optional()
 });
 
 export const formSchema = z.discriminatedUnion("type", [
