@@ -309,6 +309,8 @@ import {
   TWebhooksInsert,
   TWebhooksUpdate
 } from "@app/db/schemas";
+import { TCredentialKeys, TCredentialKeysInsert, TCredentialKeysUpdate } from "@app/db/schemas/credential-keys";
+import { TCredentials, TCredentialsInsert, TCredentialsUpdate } from "@app/db/schemas/credentials";
 import {
   TSecretV2TagJunction,
   TSecretV2TagJunctionInsert,
@@ -739,6 +741,12 @@ declare module "knex/types/tables" {
       TKmsKeyVersions,
       TKmsKeyVersionsInsert,
       TKmsKeyVersionsUpdate
+    >;
+    [TableName.Credential]: KnexOriginal.CompositeTableType<TCredentials, TCredentialsInsert, TCredentialsUpdate>;
+    [TableName.CredentialKeys]: KnexOriginal.CompositeTableType<
+      TCredentialKeys,
+      TCredentialKeysInsert,
+      TCredentialKeysUpdate
     >;
   }
 }

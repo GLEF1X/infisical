@@ -5,19 +5,27 @@ import { twMerge } from "tailwind-merge";
 import { useToggle } from "@app/hooks";
 
 const REGEX = /(\${([^}]+)})/g;
-const replaceContentWithDot = (str: string) => {
+const replaceContentWithDot = (str: string, skipLastN: number = 0) => {
   let finalStr = "";
+  const replaceUntil = str.length - skipLastN;
+
   for (let i = 0; i < str.length; i += 1) {
     const char = str.at(i);
-    finalStr += char === "\n" ? "\n" : "*";
+    if (i < replaceUntil) {
+      finalStr += char === "\n" ? "\n" : "*";
+    } else {
+      finalStr += char;
+    }
   }
   return finalStr;
 };
 
-const syntaxHighlight = (content?: string | null, isVisible?: boolean, isImport?: boolean) => {
+const syntaxHighlight = (content?: string | null, isVisible?: boolean, isImport?: boolean, isCreditCard?: boolean, isValidCreditCard?: boolean) => {
   if (isImport && !content) return "IMPORTED";
   if (content === "") return "EMPTY";
   if (!content) return "EMPTY";
+
+  if (isCreditCard && isValidCreditCard && !isVisible) return replaceContentWithDot(content, /* uncover last 4 digits */4)
   if (!isVisible) return replaceContentWithDot(content);
 
   let skipNext = false;
@@ -51,6 +59,8 @@ type Props = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   isReadOnly?: boolean;
   isDisabled?: boolean;
   containerClassName?: string;
+  isCreditCard?: boolean;
+  isValidCreditCard?: boolean;
 };
 
 const commonClassName = "font-mono text-sm caret-white border-none outline-none w-full break-all";
@@ -66,6 +76,8 @@ export const SecretInput = forwardRef<HTMLTextAreaElement, Props>(
       isDisabled,
       isReadOnly,
       onFocus,
+      isCreditCard = false,
+      isValidCreditCard = true,
       ...props
     },
     ref
@@ -81,7 +93,7 @@ export const SecretInput = forwardRef<HTMLTextAreaElement, Props>(
           <pre aria-hidden className="m-0 ">
             <code className={`inline-block w-full  ${commonClassName}`}>
               <span style={{ whiteSpace: "break-spaces" }}>
-                {syntaxHighlight(value, isVisible || isSecretFocused, isImport)}
+                {syntaxHighlight(value, isVisible || isSecretFocused, isImport, isCreditCard, isValidCreditCard)}
               </span>
             </code>
           </pre>

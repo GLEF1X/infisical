@@ -1,6 +1,8 @@
+import validator from "validator";
 import { z } from "zod";
 
 import {
+  CredentialType,
   DynamicSecretsSchema,
   IdentityProjectAdditionalPrivilegeSchema,
   IntegrationAuthsSchema,
@@ -11,6 +13,7 @@ import {
 } from "@app/db/schemas";
 import { UnpackedPermissionSchema } from "@app/ee/services/identity-project-additional-privilege/identity-project-additional-privilege-service";
 import { ProjectPermissionActions, ProjectPermissionSub } from "@app/ee/services/permission/project-permission";
+import { CardProvider } from "@app/lib/types";
 
 // sometimes the return data must be santizied to avoid leaking important values
 // always prefer pick over omit in zod
@@ -157,3 +160,72 @@ export const SanitizedProjectSchema = ProjectsSchema.pick({
   kmsCertificateKeyId: true,
   auditLogsRetentionDays: true
 });
+
+export const creditCardRawDataSchema = z
+  .object({
+    holderName: z.string().min(1).max(255).optional(),
+    provider: z.nativeEnum(CardProvider).optional(),
+    cardNumber: z.string().optional(),
+    verificationNumber: z.string().optional(),
+    // TODO: upgrade to zod 3.23 to get string date validation out of the box
+    expireAt: z
+      .string()
+      .optional()
+      .refine((expireAt) => {
+        if (!expireAt) return true;
+
+        // TODO: Check date is the first of the month
+        return validator.isDate(expireAt, {
+          format: "MM-DD-YYY"
+        });
+      }),
+    postalCode: z
+      .string()
+      .refine((postalCode) => {
+        // FIXME: add i18n locale
+        return validator.isPostalCode(postalCode, "US");
+      })
+      .optional()
+  })
+  .refine(
+    (data) => {
+      if (!data.cardNumber) {
+        return true;
+      }
+
+      return validator.isCreditCard(data.cardNumber, {
+        provider: data.provider
+      });
+    },
+    {
+      message: "Must be a valid credit card number",
+      path: ["cardNumber"]
+    }
+  );
+
+export const loginRawSchema = z.object({
+  username: z.string().min(1).optional(),
+  password: z.string().min(1).optional()
+});
+
+export const secureNoteRawSchema = z.object({
+  content: z.string().min(1).optional()
+});
+
+export const credentialsRawDataSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal(CredentialType.CREDIT_CARD), data: creditCardRawDataSchema }),
+  z.object({ type: z.literal(CredentialType.SECURE_NOTE), data: secureNoteRawSchema }),
+  z.object({ type: z.literal(CredentialType.WEB_LOGIN), data: loginRawSchema })
+]);
+
+export const credentialRawSchema = z.intersection(
+  z.object({
+    id: z.string(),
+    name: z.string().optional(),
+    orgId: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
+    label: z.string().nullable()
+  }),
+  credentialsRawDataSchema
+);

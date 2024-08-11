@@ -24,6 +24,7 @@ import { TUserAliasDALFactory } from "@app/services/user-alias/user-alias-dal";
 import { ActorAuthMethod, ActorType, AuthMethod, AuthTokenType } from "../auth/auth-type";
 import { TAuthTokenServiceFactory } from "../auth-token/auth-token-service";
 import { TokenType } from "../auth-token/auth-token-types";
+import { TCredentialKeysServiceFactoryFactory } from "../credential/credential-keys-service";
 import { TProjectDALFactory } from "../project/project-dal";
 import { TProjectKeyDALFactory } from "../project-key/project-key-dal";
 import { TProjectMembershipDALFactory } from "../project-membership/project-membership-dal";
@@ -67,6 +68,7 @@ type TOrgServiceFactoryDep = {
     TLicenseServiceFactory,
     "getPlan" | "updateSubscriptionOrgMemberCount" | "generateOrgCustomerId" | "removeOrgCustomer"
   >;
+  credentialKeysService: Pick<TCredentialKeysServiceFactoryFactory, "createCredentialKey">;
 };
 
 export type TOrgServiceFactory = ReturnType<typeof orgServiceFactory>;
@@ -87,7 +89,8 @@ export const orgServiceFactory = ({
   tokenService,
   orgBotDAL,
   licenseService,
-  samlConfigDAL
+  samlConfigDAL,
+  credentialKeysService
 }: TOrgServiceFactoryDep) => {
   /*
    * Get organization details by the organization id
@@ -340,6 +343,8 @@ export const orgServiceFactory = ({
       return org;
     });
 
+    await credentialKeysService.createCredentialKey({ orgId: organization.id, userId });
+
     await licenseService.updateSubscriptionOrgMemberCount(organization.id);
     return organization;
   };
@@ -513,6 +518,7 @@ export const orgServiceFactory = ({
       return user;
     });
 
+    await credentialKeysService.createCredentialKey({ orgId, userId: invitee.id });
     const token = await tokenService.createTokenForUser({
       type: TokenType.TOKEN_EMAIL_ORG_INVITATION,
       userId: invitee.id,

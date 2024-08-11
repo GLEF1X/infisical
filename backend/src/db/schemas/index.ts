@@ -15,6 +15,8 @@ export * from "./certificate-authority-secret";
 export * from "./certificate-bodies";
 export * from "./certificate-secrets";
 export * from "./certificates";
+export * from "./credential-keys";
+export * from "./credentials";
 export * from "./dynamic-secret-leases";
 export * from "./dynamic-secrets";
 export * from "./external-kms";

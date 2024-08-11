@@ -740,6 +740,16 @@ export const AppLayout = ({ children }: LayoutProps) => {
                           </MenuItem>
                         </a>
                       </Link>
+                      <Link href={`/org/${currentOrg?.id}/credentials`} passHref>
+                        <a>
+                          <MenuItem
+                            isSelected={router.asPath === `/org/${currentOrg?.id}/credentials`}
+                            icon="system-outline-90-lock-closed"
+                          >
+                            User secrets
+                          </MenuItem>
+                        </a>
+                      </Link>
                       {(window.location.origin.includes("https://app.infisical.com") ||
                         window.location.origin.includes("https://gamma.infisical.com")) && (
                         <Link href={`/org/${currentOrg?.id}/billing`} passHref>
