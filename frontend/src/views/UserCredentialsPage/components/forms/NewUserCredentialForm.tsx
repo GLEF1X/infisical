@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -18,7 +19,9 @@ export function NewUserCredentialForm({ onSubmit }: Props) {
     control,
     watch,
     handleSubmit,
-    formState: { isSubmitting }
+    formState: { isSubmitting },
+    getFieldState,
+    setValue
   } = useForm<UserCredentialsFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -26,6 +29,26 @@ export function NewUserCredentialForm({ onSubmit }: Props) {
     }
   });
   const credentialType = watch("type");
+
+  useEffect(() => {
+    const isLabelFieldDirty = getFieldState("label").isDirty
+    if (isLabelFieldDirty) return
+    switch (credentialType) {
+      case CredentialType.WEB_LOGIN: {
+        setValue("label", "Login")    
+        break;
+      }
+      case CredentialType.CREDIT_CARD: {
+        setValue("label", "Credit Card")
+        break;
+      }
+      case CredentialType.SECURE_NOTE: {
+        setValue("label", "Secure note")
+        break;
+      }
+      default:
+    }
+  }, [credentialType])
 
   const onFormSubmit = async (data: UserCredentialsFormData) => {
     try {
