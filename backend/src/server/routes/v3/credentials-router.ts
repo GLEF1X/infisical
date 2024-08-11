@@ -24,7 +24,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
       body: z.intersection(
         credentialsRawDataSchema,
         z.object({
-          label: z.string().optional()
+          label: z.string().optional().nullable()
         })
       ),
       response: {
@@ -64,7 +64,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
 
   server.route({
     method: "PATCH",
-    url: "/raw/:credentialId",
+    url: "/raw/:id",
     config: {
       rateLimit: writeLimit
     },
@@ -76,9 +76,9 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
         }
       ],
       params: z.object({
-        credentialId: z.string().trim().uuid().describe("TODO")
+        id: z.string().trim().uuid().describe("TODO")
       }),
-      body: z.intersection(credentialsRawDataSchema, z.object({ label: z.string().optional() })),
+      body: z.intersection(credentialsRawDataSchema, z.object({ label: z.string().optional().nullable() })),
       response: {
         200: credentialRawSchema
       }
@@ -89,7 +89,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
       if (req.auth.authMode !== AuthMode.JWT) throw new BadRequestError({});
 
       const credential = await server.services.credentials.updateCredential({
-        credentialId: req.params.credentialId,
+        credentialId: req.params.id,
         ...req.body
       });
       // TODO: add telemetry

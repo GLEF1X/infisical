@@ -36,14 +36,17 @@ export type CredentialData =
 export type TCreateCredentialDTO = {
   orgId: string;
   userId: string;
-  label?: string;
+  label?: string | null;
 } & CredentialData;
 
-export type TCredentialOut = Omit<TCredentials, "type" | "encryptedData"> & CredentialData;
+export type TCredentialOut = Omit<TCredentials, "type" | "encryptedData" | "encryptedLabel"> &
+  CredentialData & {
+    label: string | null;
+  };
 
 export type TUpdateCredentialDTO = {
   credentialId: string;
-  label?: string;
+  label?: string | null;
 } & CredentialData;
 
 export type TGetCredentialsDTO = {

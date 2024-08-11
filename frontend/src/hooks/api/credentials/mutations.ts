@@ -9,7 +9,10 @@ export const useCreateUserCredential = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (inputData: TCreateUserCredential) => {
-      const { data } = await apiRequest.post<TUserCredential>("/api/v3/credentials/raw", inputData);
+      const { data } = await apiRequest.post<TUserCredential>("/api/v3/credentials/raw", {
+        ...inputData,
+        label: inputData.label === "" ? null : inputData.label
+      });
       return data;
     },
     onSuccess: () => queryClient.invalidateQueries(userCredentialsKeys.allUserCredentials())
@@ -21,7 +24,10 @@ export const useUpdateUserCredential = () => {
   return useMutation({
     mutationFn: async (inputData: TUpdateUserCredential) => {
       // TODO: remove credentialId from body
-      const { data } = await apiRequest.patch<TUserCredential>(`/api/v3/credentials/raw/${inputData.credentialId}`, inputData);
+      const { data } = await apiRequest.patch<TUserCredential>(`/api/v3/credentials/raw/${inputData.credentialId}`, {
+        ...inputData,
+        label: inputData.label === "" ? null : inputData.label
+      });
       return data;
     },
     onSuccess: () => queryClient.invalidateQueries(userCredentialsKeys.allUserCredentials())

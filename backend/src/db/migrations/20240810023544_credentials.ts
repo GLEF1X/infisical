@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
       // TODO: potentially add a CHECK constraint here, but this will require adding a migration
       // for each new credential type
       t.string("type").notNullable();
-      t.string("label").nullable();
+      t.binary("encryptedLabel").nullable();
       t.binary("encryptedData").notNullable();
       t.uuid("userId").notNullable();
       // TODO: maybe reference credential key instead of these two

@@ -12,7 +12,7 @@ import { CredentialType, TImmutableDBKeys } from "./models";
 export const CredentialsSchema = z.object({
   id: z.string().uuid(),
   type: z.nativeEnum(CredentialType),
-  label: z.string().optional(),
+  encryptedLabel: zodBuffer.nullable(),
   encryptedData: zodBuffer,
   userId: z.string().uuid(),
   orgId: z.string().uuid(),

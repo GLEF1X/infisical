@@ -29,14 +29,14 @@ export const credentialServiceFactory = ({ credentialDAL, kmsService }: TCredent
     });
 
     const credential = await credentialDAL.create({
-      label,
+      encryptedLabel: label ? credentialManagerEncryptor({ plainText: Buffer.from(label) }).cipherTextBlob : null,
       encryptedData: credentialManagerEncryptor({ plainText: Buffer.from(JSON.stringify(shake(data))) }).cipherTextBlob,
       userId,
       type,
       orgId
     });
 
-    return { ...omit(credential, ["encryptedData"]), data } as TCredentialOut;
+    return { ...omit(credential, ["encryptedData", "encryptedLabel"]), data, label } as TCredentialOut;
   };
 
   const updateCredential = async ({ data: update, type, credentialId, label }: TUpdateCredentialDTO) => {
@@ -54,16 +54,26 @@ export const credentialServiceFactory = ({ credentialDAL, kmsService }: TCredent
       credentialManagerDecryptor({ cipherTextBlob: credential.encryptedData }).toString()
     ) as CredentialData["data"];
     const updatedData = { ...decryptedData, ...update };
-
-    const updatedCredential = await credentialDAL.updateById(credentialId, {
-      label,
+    const credentialDataToUpdate = {
       encryptedData: credentialManagerEncryptor({ plainText: Buffer.from(JSON.stringify(shake(updatedData))) })
         .cipherTextBlob
-    });
+    };
+
+    // If label is actually presented in request as null or as a value
+    if (label !== undefined) {
+      const encryptedLabel = label
+        ? credentialManagerEncryptor({ plainText: Buffer.from(label) }).cipherTextBlob
+        : null;
+      // @ts-expect-error TODO: fix this type error by assing credentialDataToUpdate update payload type
+      credentialDataToUpdate.encryptedLabel = encryptedLabel;
+    }
+
+    const updatedCredential = await credentialDAL.updateById(credentialId, credentialDataToUpdate);
 
     return {
-      ...omit(updatedCredential, ["encryptedData"]),
-      data: decryptedData
+      ...omit(updatedCredential, ["encryptedData", "encryptedLabel"]),
+      data: decryptedData,
+      label
     } as TCredentialOut;
   };
 
@@ -75,12 +85,14 @@ export const credentialServiceFactory = ({ credentialDAL, kmsService }: TCredent
       userId
     });
     return credentials.map((credential) => {
-      const { encryptedData, ...rest } = credential;
+      const { encryptedData, encryptedLabel, ...rest } = credential;
+
       return {
         ...rest,
         data: JSON.parse(
           credentialManagerDecryptor({ cipherTextBlob: encryptedData }).toString()
-        ) as CredentialData["data"]
+        ) as CredentialData["data"],
+        label: encryptedLabel ? credentialManagerDecryptor({ cipherTextBlob: encryptedLabel }).toString() : null
       } as TCredentialOut;
     });
   };
