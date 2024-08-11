@@ -18,13 +18,10 @@ import { UserCredentialRow } from "./UserCredentialsRow";
 type Props = {
   handlePopUpOpen: (
     popUpName: keyof UsePopUpState<["deleteUserCredential", "updateUserCredential"]>,
-    {
-      name,
-      id
-    }: {
-      name: string;
+    data: {
+      label: string;
       id: string;
-    }
+    } | {name: string; id: string;}
   ) => void;
 };
 
