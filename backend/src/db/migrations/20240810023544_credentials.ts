@@ -27,7 +27,8 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.createTable(TableName.CredentialKeys, (t) => {
       t.uuid("id", { primaryKey: true }).defaultTo(knex.fn.uuid());
       t.binary("kmsSecretManagerEncryptedDataKey").notNullable();
-      t.string("kmsSecretManagerKeyId").notNullable();
+      t.uuid("kmsSecretManagerKeyId").notNullable();
+      t.foreign("kmsSecretManagerKeyId").references("id").inTable(TableName.KmsKey);
       t.uuid("userId").notNullable();
       t.foreign("userId").references("id").inTable(TableName.Users).onDelete("CASCADE");
       t.uuid("orgId").notNullable();
