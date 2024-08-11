@@ -649,6 +649,15 @@ export const RAW_SECRETS = {
   }
 } as const;
 
+export const RAW_CREDENTIALS = {
+  UPDATE: {
+    id: "The id of the credential to delete."
+  },
+  DELETE: {
+    id: "The id of the credential to delete."
+  }
+} as const;
+
 export const SECRET_IMPORTS = {
   LIST: {
     workspaceId: "The ID of the project to list secret imports from.",

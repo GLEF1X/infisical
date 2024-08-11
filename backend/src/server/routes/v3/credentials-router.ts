@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { RAW_CREDENTIALS } from "@app/lib/api-docs";
 import { BadRequestError } from "@app/lib/errors";
 import { readLimit, writeLimit } from "@app/server/config/rateLimiter";
 import { verifyAuth } from "@app/server/plugins/auth/verify-auth";
@@ -76,7 +77,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
         }
       ],
       params: z.object({
-        id: z.string().trim().uuid().describe("TODO")
+        id: z.string().trim().uuid().describe(RAW_CREDENTIALS.UPDATE.id)
       }),
       body: z.intersection(credentialsRawDataSchema, z.object({ label: z.string().optional().nullable() })),
       response: {
@@ -132,7 +133,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
 
   server.route({
     method: "DELETE",
-    url: "/raw/:credentialId",
+    url: "/raw/:id",
     config: {
       rateLimit: writeLimit
     },
@@ -144,7 +145,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
         }
       ],
       params: z.object({
-        credentialId: z.string().trim().uuid().describe("TODO")
+        id: z.string().trim().uuid().describe(RAW_CREDENTIALS.DELETE.id)
       }),
       response: {
         200: z.object({ success: z.literal(true) })
@@ -156,7 +157,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
       if (req.auth.authMode !== AuthMode.JWT) throw new BadRequestError({});
 
       await server.services.credentials.deleteCredential({
-        credentialId: req.params.credentialId
+        credentialId: req.params.id
       });
       // TODO: add telemetry
 
