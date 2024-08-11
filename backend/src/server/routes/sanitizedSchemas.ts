@@ -233,7 +233,8 @@ export const credentialRawSchema = z.intersection(
     name: z.string().optional(),
     orgId: z.string(),
     createdAt: z.date(),
-    updatedAt: z.date()
+    updatedAt: z.date(),
+    label: z.string().optional().nullable()
   }),
   credentialsRawDataSchema
 );

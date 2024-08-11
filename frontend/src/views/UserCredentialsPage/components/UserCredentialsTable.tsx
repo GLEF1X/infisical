@@ -40,7 +40,6 @@ export const UserCredentialsTable = ({ handlePopUpOpen }: Props) => {
             <Th>Name</Th>
             <Th>Created At</Th>
             <Th aria-label="button" className="w-5" />
-            <Th aria-label="button" className="w-5" />
           </Tr>
         </THead>
         <TBody>

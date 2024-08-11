@@ -20,7 +20,8 @@ export const useUpdateUserCredential = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (inputData: TUpdateUserCredential) => {
-      const { data } = await apiRequest.patch<TUserCredential>("/api/v3/credentials/", inputData);
+      // TODO: remove credentialId from body
+      const { data } = await apiRequest.patch<TUserCredential>(`/api/v3/credentials/raw/${inputData.credentialId}`, inputData);
       return data;
     },
     onSuccess: () => queryClient.invalidateQueries(userCredentialsKeys.allUserCredentials())

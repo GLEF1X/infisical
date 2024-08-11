@@ -67,7 +67,7 @@ export const credentialServiceFactory = ({ credentialDAL, kmsService }: TCredent
   };
 
   const getCredentials = async ({ userId, orgId }: TGetSecretsDTO) => {
-    const credentials = await credentialDAL.find({ userId, orgId });
+    const credentials = await credentialDAL.getAllSecretsInReverseChronologicalOrder(orgId, userId);
     const { decryptor: credentialManagerDecryptor } = await kmsService.createCipherPairWithDataKey({
       type: KmsDataKey.CredentialManager,
       orgId,

@@ -1,7 +1,7 @@
 import { Modal, ModalContent } from "@app/components/v2";
 import { UsePopUpState } from "@app/hooks/usePopUp";
 
-import { NewUserCredentialForm } from "./NewUserCredentialForm";
+import { NewUserCredentialForm } from "./forms/NewUserCredentialForm";
 
 type Props = {
   popUp: UsePopUpState<["createUserCredential"]>;
@@ -19,11 +19,12 @@ export const AddUserCredentialModal = ({ popUp, handlePopUpToggle }: Props) => {
         handlePopUpToggle("createUserCredential", isOpen);
       }}
     >
-      <ModalContent
-        title="Create a credential"
-        subTitle="Create & update all kinds of credentials"
-      >
-        <NewUserCredentialForm/>
+      <ModalContent title="Create a credential" subTitle="Create & update all kinds of credentials">
+        <NewUserCredentialForm
+          onSubmit={() => {
+            handlePopUpToggle("createUserCredential", false);
+          }}
+        />
       </ModalContent>
     </Modal>
   );
