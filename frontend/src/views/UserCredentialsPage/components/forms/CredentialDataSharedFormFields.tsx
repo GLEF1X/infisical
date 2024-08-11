@@ -1,4 +1,5 @@
 import { Control, Controller } from "react-hook-form";
+import isCreditCard from "validator/lib/isCreditCard";
 
 import { FormControl, Input, SecretInput, Select, SelectItem } from "@app/components/v2";
 import { CardProvider, CredentialType } from "@app/hooks/api/credentials";
@@ -91,6 +92,7 @@ export function CredentialDataSharedFormFields({ credentialType, control }: Prop
                   onValueChange={(e) => onChange(e)}
                   className="w-full"
                 >
+                  <SelectItem value="" key="__EMPTY_VALUE__">unselect</SelectItem>
                   {Object.values(CardProvider).map((name) => (
                     <SelectItem value={name} key={name}>
                       {name}
@@ -112,6 +114,8 @@ export function CredentialDataSharedFormFields({ credentialType, control }: Prop
               >
                 <SecretInput
                   {...field}
+                  isValidCreditCard={field.value ? isCreditCard(field.value) : false}
+                  isCreditCard
                   containerClassName="text-bunker-300 hover:border-primary-400/50 border border-mineshaft-600 bg-mineshaft-900 px-2 py-1.5"
                 />
               </FormControl>
