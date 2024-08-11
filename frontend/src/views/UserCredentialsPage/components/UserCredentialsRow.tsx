@@ -8,7 +8,6 @@ import { useToggle } from "@app/hooks";
 import { CredentialType, TUserCredential } from "@app/hooks/api/credentials";
 import { UsePopUpState } from "@app/hooks/usePopUp";
 
-import { NewUserCredentialForm } from "./forms/NewUserCredentialForm";
 import { UpdateUserCredentialsForm } from "./forms/UpdateUserCredentialForm";
 
 export const UserCredentialRow = ({
@@ -22,6 +21,7 @@ export const UserCredentialRow = ({
       id
     }: {
       id: string;
+      label: string;
     }
   ) => void;
 }) => {
@@ -54,7 +54,8 @@ export const UserCredentialRow = ({
             onClick={(e) => {
               e.stopPropagation();
               handlePopUpOpen("deleteUserCredential", {
-                id: row.id
+                id: row.id,
+                label: credentialName
               });
             }}
             variant="plain"

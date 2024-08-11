@@ -3,13 +3,17 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { createNotification } from "@app/components/notifications";
-import { Button } from "@app/components/v2";
+import { Button, DeleteActionModal } from "@app/components/v2";
 import { usePopUp } from "@app/hooks";
+import { useDeleteUserCredential } from "@app/hooks/api/credentials/mutations";
 
 import { AddUserCredentialModal } from "./AddUserCredentialModal";
 import { UserCredentialsTable } from "./UserCredentialsTable";
 
+type DeleteModalData = { id: string; label: string; };
+
 export function UserCredentialsSection() {
+  const deleteUserCredential = useDeleteUserCredential();
   const { popUp, handlePopUpToggle, handlePopUpClose, handlePopUpOpen } = usePopUp([
     "createUserCredential",
     "deleteUserCredential",
@@ -18,9 +22,9 @@ export function UserCredentialsSection() {
 
   const onDeleteApproved = async () => {
     try {
-      // deleteSharedSecret.mutateAsync({
-      //   sharedSecretId: (popUp?.deleteSharedSecretConfirmation?.data as DeleteModalData)?.id
-      // });
+      deleteUserCredential.mutateAsync({
+        credentialId: (popUp?.deleteUserCredential?.data as DeleteModalData)?.id
+      });
       createNotification({
         text: "Successfully deleted credential",
         type: "success"
@@ -52,16 +56,16 @@ export function UserCredentialsSection() {
       </div>
       <UserCredentialsTable handlePopUpOpen={handlePopUpOpen} />
       <AddUserCredentialModal popUp={popUp} handlePopUpToggle={handlePopUpToggle} />
-      {/* <DeleteActionModal
-        isOpen={popUp.deleteSharedSecretConfirmation.isOpen}
+      <DeleteActionModal
+        isOpen={popUp.deleteUserCredential.isOpen}
         title={`Delete ${
-          (popUp?.deleteSharedSecretConfirmation?.data as DeleteModalData)?.name || " "
-        } shared secret?`}
-        onChange={(isOpen) => handlePopUpToggle("deleteSharedSecretConfirmation", isOpen)}
-        deleteKey={(popUp?.deleteSharedSecretConfirmation?.data as DeleteModalData)?.name}
-        onClose={() => handlePopUpClose("deleteSharedSecretConfirmation")}
+          (popUp?.deleteUserCredential?.data as DeleteModalData)?.label || " "
+        } credential?`}
+        onChange={(isOpen) => handlePopUpToggle("deleteUserCredential", isOpen)}
+        deleteKey={(popUp?.deleteUserCredential?.data as DeleteModalData)?.label}
+        onClose={() => handlePopUpClose("deleteUserCredential")}
         onDeleteApproved={onDeleteApproved}
-      /> */}
+      />
     </div>
   );
 }

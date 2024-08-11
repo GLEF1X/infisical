@@ -41,6 +41,8 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
         userId: req.auth.user.id,
         ...req.body
       });
+
+      // TODO: add telemetry
       // await server.services.auditLog.createAuditLog({
       //   projectId: req.body.workspaceId,
       //   ...req.auditLogInfo,
@@ -90,6 +92,7 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
         credentialId: req.params.credentialId,
         ...req.body
       });
+      // TODO: add telemetry
 
       return credential;
     }
@@ -121,8 +124,43 @@ export const registerCredentialsRouter = async (server: FastifyZodProvider) => {
         orgId: req.auth.orgId,
         userId: req.auth.user.id
       });
+      // TODO: add telemetry
 
       return credentials;
+    }
+  });
+
+  server.route({
+    method: "DELETE",
+    url: "/raw/:credentialId",
+    config: {
+      rateLimit: writeLimit
+    },
+    schema: {
+      description: "Delete credential",
+      security: [
+        {
+          bearerAuth: []
+        }
+      ],
+      params: z.object({
+        credentialId: z.string().trim().uuid().describe("TODO")
+      }),
+      response: {
+        200: z.object({ success: z.literal(true) })
+      }
+    },
+    onRequest: verifyAuth([AuthMode.JWT]),
+    handler: async (req) => {
+      // This is for satisfying typescript
+      if (req.auth.authMode !== AuthMode.JWT) throw new BadRequestError({});
+
+      await server.services.credentials.deleteCredential({
+        credentialId: req.params.credentialId
+      });
+      // TODO: add telemetry
+
+      return { success: true } as const;
     }
   });
 };

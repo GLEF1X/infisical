@@ -8,7 +8,8 @@ import type {
   CredentialData,
   TCreateCredentialDTO,
   TCredentialOut,
-  TGetSecretsDTO,
+  TDeleteCredentialDTO,
+  TGetCredentialsDTO,
   TUpdateCredentialDTO
 } from "./credential-types";
 
@@ -66,7 +67,7 @@ export const credentialServiceFactory = ({ credentialDAL, kmsService }: TCredent
     } as TCredentialOut;
   };
 
-  const getCredentials = async ({ userId, orgId }: TGetSecretsDTO) => {
+  const getCredentials = async ({ userId, orgId }: TGetCredentialsDTO) => {
     const credentials = await credentialDAL.getAllSecretsInReverseChronologicalOrder(orgId, userId);
     const { decryptor: credentialManagerDecryptor } = await kmsService.createCipherPairWithDataKey({
       type: KmsDataKey.CredentialManager,
@@ -84,9 +85,14 @@ export const credentialServiceFactory = ({ credentialDAL, kmsService }: TCredent
     });
   };
 
+  const deleteCredential = async ({ credentialId }: TDeleteCredentialDTO) => {
+    await credentialDAL.deleteById(credentialId);
+  };
+
   return {
     createCredential,
     updateCredential,
-    getCredentials
+    getCredentials,
+    deleteCredential
   };
 };

@@ -46,7 +46,11 @@ export type TUpdateCredentialDTO = {
   label?: string;
 } & CredentialData;
 
-export type TGetSecretsDTO = {
+export type TGetCredentialsDTO = {
   userId: string;
   orgId: string;
+};
+
+export type TDeleteCredentialDTO = {
+  credentialId: string;
 };
