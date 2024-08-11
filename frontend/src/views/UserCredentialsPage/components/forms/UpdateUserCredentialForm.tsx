@@ -23,7 +23,7 @@ export const UpdateUserCredentialsForm = ({credential}: UpdateCredentialProps) =
     formState: { isSubmitting, isDirty, isSubmitted }
   } = useForm<UserCredentialsFormData>({
     resolver: zodResolver(formSchema),
-    values: credential
+    values: credential,
   });
 
   useEffect(() => {

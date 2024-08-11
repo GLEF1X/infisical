@@ -3,9 +3,10 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { createNotification } from "@app/components/notifications";
-import { Button, FormControl, Input, SecretInput, Select, SelectItem } from "@app/components/v2";
+import { Button, FormControl, Input, Select, SelectItem } from "@app/components/v2";
 import { CredentialType, useCreateUserCredential } from "@app/hooks/api/credentials";
 
+import { CredentialDataSharedFormFields } from "./CredentialDataSharedFormFields";
 import { type UserCredentialsFormData, formSchema } from "./schema";
 
 type Props = {
@@ -25,7 +26,7 @@ export function NewUserCredentialForm({ onSubmit }: Props) {
   } = useForm<UserCredentialsFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: CredentialType.WEB_LOGIN
+      type: CredentialType.WEB_LOGIN,
     }
   });
   const credentialType = watch("type");
@@ -95,56 +96,7 @@ export function NewUserCredentialForm({ onSubmit }: Props) {
           </FormControl>
         )}
       />
-      {credentialType === CredentialType.WEB_LOGIN ? (
-        <>
-          <Controller
-            control={control}
-            name="data.username"
-            render={({ field, fieldState: { error } }) => (
-              <FormControl label="Username" isError={Boolean(error)} errorText={error?.message}>
-                <Input {...field} type="text" />
-              </FormControl>
-            )}
-          />
-          <Controller
-            control={control}
-            name="data.password"
-            render={({ field, fieldState: { error } }) => (
-              <FormControl
-                label="Password"
-                isError={Boolean(error)}
-                errorText={error?.message}
-                className="mb-2"
-              >
-                <SecretInput
-                  {...field}
-                  containerClassName="text-bunker-300 hover:border-primary-400/50 border border-mineshaft-600 bg-mineshaft-900 px-2 py-1.5"
-                />
-              </FormControl>
-            )}
-          />
-        </>
-      ) : null}
-      {credentialType === CredentialType.SECURE_NOTE ? (
-        <Controller
-          control={control}
-          name="data.content"
-          render={({ field, fieldState: { error } }) => (
-            <FormControl
-              label="Secure note"
-              isError={Boolean(error)}
-              errorText={error?.message}
-              className="mb-2"
-            >
-              <textarea
-                placeholder="Add any notes about this item here"
-                {...field}
-                className="h-40 min-h-[70px] w-full rounded-md border border-mineshaft-600 bg-mineshaft-900 py-1.5 px-2 text-bunker-300 outline-none transition-all placeholder:text-mineshaft-400 hover:border-primary-400/30 focus:border-primary-400/50 group-hover:mr-2"
-              />
-            </FormControl>
-          )}
-        />
-      ) : null}
+      <CredentialDataSharedFormFields control={control} credentialType={credentialType}/>
       <Button
         className="mt-4"
         size="sm"

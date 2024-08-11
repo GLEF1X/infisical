@@ -20,7 +20,7 @@ export type CreditCard = {
   cardNumber?: string;
   holderName?: string;
   provider?: CardProvider;
-  verificationNumber?: number;
+  verificationNumber?: string;
   expireAt?: string;
   postalCode?: string;
 };

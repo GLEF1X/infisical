@@ -173,7 +173,7 @@ export const creditCardRawDataSchema = z
       .optional(),
     provider: z.nativeEnum(CardProvider).optional(),
     cardNumber: z.string().optional(),
-    verificationNumber: z.number().optional(),
+    verificationNumber: z.string().optional(),
     // TODO: upgrade to zod 3.23 to get string date validation out of the box
     expireAt: z
       .string()
