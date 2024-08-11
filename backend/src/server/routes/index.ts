@@ -89,6 +89,9 @@ import { certificateAuthorityDALFactory } from "@app/services/certificate-author
 import { certificateAuthorityQueueFactory } from "@app/services/certificate-authority/certificate-authority-queue";
 import { certificateAuthoritySecretDALFactory } from "@app/services/certificate-authority/certificate-authority-secret-dal";
 import { certificateAuthorityServiceFactory } from "@app/services/certificate-authority/certificate-authority-service";
+import { credentialDALFactory } from "@app/services/credential/credential-dal";
+import { credentialKeysDALFactory } from "@app/services/credential/credential-keys-dal";
+import { credentialServiceFactory } from "@app/services/credential/credential-service";
 import { groupProjectDALFactory } from "@app/services/group-project/group-project-dal";
 import { groupProjectMembershipRoleDALFactory } from "@app/services/group-project/group-project-membership-role-dal";
 import { groupProjectServiceFactory } from "@app/services/group-project/group-project-service";
@@ -189,6 +192,7 @@ import { registerSecretScannerGhApp } from "../plugins/secret-scanner";
 import { registerV1Routes } from "./v1";
 import { registerV2Routes } from "./v2";
 import { registerV3Routes } from "./v3";
+import { credentialKeysServiceFactory } from "@app/services/credential/credential-keys-service";
 
 export const registerRoutes = async (
   server: FastifyZodProvider,
@@ -307,6 +311,8 @@ export const registerRoutes = async (
   const internalKmsDAL = internalKmsDALFactory(db);
   const externalKmsDAL = externalKmsDALFactory(db);
   const kmsRootConfigDAL = kmsRootConfigDALFactory(db);
+  const credentialDAL = credentialDALFactory(db);
+  const credentialKeysDAL = credentialKeysDALFactory(db);
 
   const permissionService = permissionServiceFactory({
     permissionDAL,
@@ -322,7 +328,8 @@ export const registerRoutes = async (
     kmsDAL,
     internalKmsDAL,
     orgDAL,
-    projectDAL
+    projectDAL,
+    credentialKeysDAL
   });
   const externalKmsService = externalKmsServiceFactory({
     kmsDAL,
@@ -459,6 +466,10 @@ export const registerRoutes = async (
     authDAL,
     userDAL
   });
+  const credentialKeysService = credentialKeysServiceFactory({
+    kmsService,
+    credentialKeysDAL
+  });
   const orgService = orgServiceFactory({
     userAliasDAL,
     licenseService,
@@ -475,7 +486,8 @@ export const registerRoutes = async (
     smtpService,
     userDAL,
     groupDAL,
-    orgBotDAL
+    orgBotDAL,
+    credentialKeysService
   });
   const signupService = authSignupServiceFactory({
     tokenService,
@@ -1057,6 +1069,11 @@ export const registerRoutes = async (
     userDAL
   });
 
+  const credentialService = credentialServiceFactory({
+    credentialDAL,
+    kmsService
+  });
+
   await superAdminService.initServerCfg();
   //
   // setup the communication with license key server
@@ -1133,7 +1150,8 @@ export const registerRoutes = async (
     secretSharing: secretSharingService,
     userEngagement: userEngagementService,
     externalKms: externalKmsService,
-    orgAdmin: orgAdminService
+    orgAdmin: orgAdminService,
+    credentials: credentialService
   });
 
   const cronJobs: CronJob[] = [];

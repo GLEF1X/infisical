@@ -108,6 +108,9 @@ export enum TableName {
   ExternalKms = "external_kms",
   InternalKms = "internal_kms",
   InternalKmsKeyVersion = "internal_kms_key_version",
+  // User credentials
+  Credential = "credentials",
+  CredentialKeys = "credential_keys",
   // @depreciated
   KmsKeyVersion = "kms_key_versions"
 }
@@ -184,4 +187,10 @@ export enum IdentityAuthMethod {
   AWS_AUTH = "aws-auth",
   AZURE_AUTH = "azure-auth",
   OIDC_AUTH = "oidc-auth"
+}
+
+export enum CredentialType {
+  WEB_LOGIN = "web-login",
+  CREDIT_CARD = "credit-card",
+  SECURE_NOTE = "secure-note"
 }

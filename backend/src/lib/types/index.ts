@@ -52,3 +52,13 @@ export enum SecretSharingAccessType {
   Anyone = "anyone",
   Organization = "organization"
 }
+
+export enum CardProvider {
+  AMEX = "amex",
+  DINERS_CLUB = "dinersclub",
+  DISCOVER = "discover",
+  JCB = "jcb",
+  MASTERCARD = "mastercard",
+  UNIONPAY = "unionpay",
+  VISA = "visa"
+}

@@ -18,6 +18,7 @@ import { BadRequestError, NotFoundError } from "@app/lib/errors";
 import { logger } from "@app/lib/logger";
 import { alphaNumericNanoId } from "@app/lib/nanoid";
 
+import { TCredentialKeysDALFactory } from "../credential/credential-keys-dal";
 import { TOrgDALFactory } from "../org/org-dal";
 import { TProjectDALFactory } from "../project/project-dal";
 import { TInternalKmsDALFactory } from "./internal-kms-dal";
@@ -42,6 +43,8 @@ type TKmsServiceFactoryDep = {
   kmsRootConfigDAL: Pick<TKmsRootConfigDALFactory, "findById" | "create">;
   keyStore: Pick<TKeyStoreFactory, "acquireLock" | "waitTillReady" | "setItemWithExpiry">;
   internalKmsDAL: Pick<TInternalKmsDALFactory, "create">;
+  // TODO: pick specific methods to inject
+  credentialKeysDAL: TCredentialKeysDALFactory;
 };
 
 export type TKmsServiceFactory = ReturnType<typeof kmsServiceFactory>;
@@ -62,7 +65,8 @@ export const kmsServiceFactory = ({
   keyStore,
   internalKmsDAL,
   orgDAL,
-  projectDAL
+  projectDAL,
+  credentialKeysDAL
 }: TKmsServiceFactoryDep) => {
   let ROOT_ENCRYPTION_KEY = Buffer.alloc(0);
 
@@ -418,7 +422,6 @@ export const kmsServiceFactory = ({
     const kmsDecryptor = await decryptWithKmsKey({
       kmsId: kmsKeyId
     });
-
     return kmsDecryptor({
       cipherTextBlob: org.kmsEncryptedDataKey
     });
@@ -562,10 +565,26 @@ export const kmsServiceFactory = ({
     });
   };
 
+  const $getCredentialManagerKmsDataKey = async (orgId: string, userId: string) => {
+    // TODO: add asymetric encryption using user's public/private key pair
+    const credentialKey = await credentialKeysDAL.findOne({ orgId, userId });
+
+    const kmsDecryptor = await decryptWithKmsKey({
+      kmsId: credentialKey.kmsSecretManagerKeyId
+    });
+
+    return kmsDecryptor({
+      cipherTextBlob: credentialKey.kmsSecretManagerEncryptedDataKey
+    });
+  };
+
   const $getDataKey = async (dto: TEncryptWithKmsDataKeyDTO) => {
     switch (dto.type) {
       case KmsDataKey.SecretManager: {
         return $getProjectSecretManagerKmsDataKey(dto.projectId);
+      }
+      case KmsDataKey.CredentialManager: {
+        return $getCredentialManagerKmsDataKey(dto.orgId, dto.userId);
       }
       default: {
         return $getOrgKmsDataKey(dto.orgId);

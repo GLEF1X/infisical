@@ -1,6 +1,10 @@
+import isCreditCard from "validator/lib/isCreditCard";
+import isDate from "validator/lib/isDate";
+import isPostalCode from "validator/lib/isPostalCode";
 import { z } from "zod";
 
 import {
+  CredentialType,
   DynamicSecretsSchema,
   IdentityProjectAdditionalPrivilegeSchema,
   IntegrationAuthsSchema,
@@ -11,6 +15,7 @@ import {
 } from "@app/db/schemas";
 import { UnpackedPermissionSchema } from "@app/ee/services/identity-project-additional-privilege/identity-project-additional-privilege-service";
 import { ProjectPermissionActions, ProjectPermissionSub } from "@app/ee/services/permission/project-permission";
+import { CardProvider } from "@app/lib/types";
 
 // sometimes the return data must be santizied to avoid leaking important values
 // always prefer pick over omit in zod
@@ -157,3 +162,78 @@ export const SanitizedProjectSchema = ProjectsSchema.pick({
   kmsCertificateKeyId: true,
   auditLogsRetentionDays: true
 });
+
+export const creditCardRawDataSchema = z
+  .object({
+    holderName: z
+      .string()
+      .trim()
+      .min(1)
+      .max(255)
+      .regex(/^[\d\s-]*$/)
+      .optional(),
+    provider: z.nativeEnum(CardProvider).optional(),
+    cardNumber: z.string().trim().optional(),
+    verificationNumber: z.number().optional(),
+    // TODO: upgrade to zod 3.23 to get string date validation out of the box
+    expireAt: z
+      .string()
+      .optional()
+      .refine((expireAt) => {
+        if (!expireAt) return true;
+
+        // TODO: Check date is the first of the month
+        return isDate(expireAt, {
+          format: "MM-DD-YYY"
+        });
+      }),
+    postalCode: z
+      .string()
+      .trim()
+      .refine((postalCode) => {
+        // FIXME: add i18n locale
+        return isPostalCode(postalCode, "US");
+      })
+      .optional()
+  })
+  .refine(
+    (data) => {
+      if (!data.cardNumber) {
+        return true;
+      }
+
+      return isCreditCard(data.cardNumber, {
+        provider: data.provider
+      });
+    },
+    {
+      message: "Must be a valid credit card number",
+      path: ["cardNumber"]
+    }
+  );
+
+export const loginRawSchema = z.object({
+  username: z.string().trim().min(1).optional(),
+  password: z.string().trim().min(1).optional()
+});
+
+export const secureNoteRawSchema = z.object({
+  content: z.string().trim().min(1).optional()
+});
+
+export const credentialsRawDataSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal(CredentialType.CREDIT_CARD), data: creditCardRawDataSchema }),
+  z.object({ type: z.literal(CredentialType.SECURE_NOTE), data: secureNoteRawSchema }),
+  z.object({ type: z.literal(CredentialType.WEB_LOGIN), data: loginRawSchema })
+]);
+
+export const credentialRawSchema = z.intersection(
+  z.object({
+    id: z.string(),
+    name: z.string().optional(),
+    orgId: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date()
+  }),
+  credentialsRawDataSchema
+);
