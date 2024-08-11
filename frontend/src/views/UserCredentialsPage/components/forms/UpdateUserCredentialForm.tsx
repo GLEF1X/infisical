@@ -20,7 +20,7 @@ export const UpdateUserCredentialsForm = ({credential}: UpdateCredentialProps) =
     control,
     reset,
     handleSubmit,
-    formState: { isSubmitting, isDirty, isSubmitted }
+    formState: { isSubmitting, isDirty, isSubmitSuccessful }
   } = useForm<UserCredentialsFormData>({
     resolver: zodResolver(formSchema),
     values: credential,
@@ -30,10 +30,10 @@ export const UpdateUserCredentialsForm = ({credential}: UpdateCredentialProps) =
     // NOTE: here we're making sure that the form is reset and isDirty set to false
     // This helps us to disable update button after a succesful submission.
     // More on this https://github.com/react-hook-form/react-hook-form/issues/3097
-    if (isSubmitted) {
+    if (isSubmitSuccessful) {
       reset({}, { keepValues: true });
     }
-  }, [isSubmitted, reset]);
+  }, [isSubmitSuccessful, reset]);
 
   const onFormSubmit = async (formData: UserCredentialsFormData) => {
     try {

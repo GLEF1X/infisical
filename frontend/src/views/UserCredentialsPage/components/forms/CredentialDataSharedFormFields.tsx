@@ -68,11 +68,17 @@ export function CredentialDataSharedFormFields({ credentialType, control }: Prop
           <Controller
             control={control}
             name="data.holderName"
-            render={({ field: { onChange, ...field }, fieldState: { error } }) => (
-              <FormControl label="Holder name" isError={Boolean(error)} errorText={error?.message}>
-                <Input {...field} type="text" />
-              </FormControl>
-            )}
+            render={({ field, fieldState: { error } }) => {
+              return (
+                <FormControl
+                  label="Holder name"
+                  isError={Boolean(error)}
+                  errorText={error?.message}
+                >
+                  <Input {...field} type="text" />
+                </FormControl>
+              );
+            }}
           />
           <Controller
             control={control}

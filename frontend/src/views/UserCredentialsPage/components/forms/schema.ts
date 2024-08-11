@@ -11,7 +11,6 @@ export const creditCardDataSchema = z
       .string()
       .min(1)
       .max(255)
-      .regex(/^[\d\s-]*$/)
       .optional(),
     provider: z.nativeEnum(CardProvider).optional(),
     cardNumber: z.string().optional(),

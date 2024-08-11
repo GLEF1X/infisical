@@ -165,12 +165,7 @@ export const SanitizedProjectSchema = ProjectsSchema.pick({
 
 export const creditCardRawDataSchema = z
   .object({
-    holderName: z
-      .string()
-      .min(1)
-      .max(255)
-      .regex(/^[\d\s-]*$/)
-      .optional(),
+    holderName: z.string().min(1).max(255).optional(),
     provider: z.nativeEnum(CardProvider).optional(),
     cardNumber: z.string().optional(),
     verificationNumber: z.string().optional(),
