@@ -1,4 +1,4 @@
-import { isCreditCard, isDate, isPostalCode } from "validator";
+import validator from "validator";
 import { z } from "zod";
 
 import {
@@ -175,7 +175,7 @@ export const creditCardRawDataSchema = z
         if (!expireAt) return true;
 
         // TODO: Check date is the first of the month
-        return isDate(expireAt, {
+        return validator.isDate(expireAt, {
           format: "MM-DD-YYY"
         });
       }),
@@ -183,7 +183,7 @@ export const creditCardRawDataSchema = z
       .string()
       .refine((postalCode) => {
         // FIXME: add i18n locale
-        return isPostalCode(postalCode, "US");
+        return validator.isPostalCode(postalCode, "US");
       })
       .optional()
   })
@@ -193,7 +193,7 @@ export const creditCardRawDataSchema = z
         return true;
       }
 
-      return isCreditCard(data.cardNumber, {
+      return validator.isCreditCard(data.cardNumber, {
         provider: data.provider
       });
     },
