@@ -55,6 +55,10 @@ export function NewUserCredentialForm({ onSubmit }: Props) {
     try {
       await createCredential.mutateAsync(data);
       onSubmit?.();
+      createNotification({
+        text: "Credential was successfully created",
+        type: "success"
+      });
     } catch (error) {
       console.error(error);
       createNotification({

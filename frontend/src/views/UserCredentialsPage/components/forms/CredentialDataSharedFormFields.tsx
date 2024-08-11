@@ -92,7 +92,6 @@ export function CredentialDataSharedFormFields({ credentialType, control }: Prop
                   onValueChange={(e) => onChange(e)}
                   className="w-full"
                 >
-                  <SelectItem value="" key="__EMPTY_VALUE__">unselect</SelectItem>
                   {Object.values(CardProvider).map((name) => (
                     <SelectItem value={name} key={name}>
                       {name}
