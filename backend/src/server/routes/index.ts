@@ -91,6 +91,7 @@ import { certificateAuthoritySecretDALFactory } from "@app/services/certificate-
 import { certificateAuthorityServiceFactory } from "@app/services/certificate-authority/certificate-authority-service";
 import { credentialDALFactory } from "@app/services/credential/credential-dal";
 import { credentialKeysDALFactory } from "@app/services/credential/credential-keys-dal";
+import { credentialKeysServiceFactory } from "@app/services/credential/credential-keys-service";
 import { credentialServiceFactory } from "@app/services/credential/credential-service";
 import { groupProjectDALFactory } from "@app/services/group-project/group-project-dal";
 import { groupProjectMembershipRoleDALFactory } from "@app/services/group-project/group-project-membership-role-dal";
@@ -192,7 +193,6 @@ import { registerSecretScannerGhApp } from "../plugins/secret-scanner";
 import { registerV1Routes } from "./v1";
 import { registerV2Routes } from "./v2";
 import { registerV3Routes } from "./v3";
-import { credentialKeysServiceFactory } from "@app/services/credential/credential-keys-service";
 
 export const registerRoutes = async (
   server: FastifyZodProvider,

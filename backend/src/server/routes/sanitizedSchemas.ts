@@ -1,6 +1,6 @@
-import isCreditCard from "validator/lib/isCreditCard";
-import isDate from "validator/lib/isDate";
-import isPostalCode from "validator/lib/isPostalCode";
+import isCreditCard from "validator/es/lib/isCreditCard";
+import isDate from "validator/es/lib/isDate";
+import isPostalCode from "validator/es/lib/isPostalCode";
 import { z } from "zod";
 
 import {
